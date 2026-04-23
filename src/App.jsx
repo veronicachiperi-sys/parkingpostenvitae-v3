@@ -1,64 +1,149 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SPOTS, DEFAULT_BOOKINGS, getAvailableSpots } from './data';
-import { useLocalStorage } from './useLocalStorage';
+import { supabase } from './supabase';
 import SpotCard from './SpotCard';
 import BookingModal from './BookingModal';
 import BookingHistory from './BookingHistory';
 import CalendarView from './CalendarView';
 import styles from './App.module.css';
-
+ 
 export default function App() {
-  const [bookings, setBookings] = useLocalStorage('post-parking-bookings-v3', DEFAULT_BOOKINGS);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState('cards');
   const [toast, setToast] = useState(null);
   const [animatingId, setAnimatingId] = useState(null);
-
+ 
   const [bookingModal, setBookingModal] = useState(null);
   const [historySpot, setHistorySpot] = useState(null);
-
+ 
   const [searchIn, setSearchIn] = useState('');
   const [searchOut, setSearchOut] = useState('');
-
+ 
   const today = new Date().toISOString().split('T')[0];
-
+ 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
   const triggerPulse = (id) => { setAnimatingId(id); setTimeout(() => setAnimatingId(null), 600); };
-
-  const handleSaveBooking = (entry, isEdit) => {
+ 
+  // Load bookings from Supabase
+  const fetchBookings = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .order('check_in', { ascending: true });
+ 
+    if (error) {
+      console.error('Error fetching bookings:', error);
+      showToast('Error loading bookings');
+      return;
+    }
+ 
+    // Map database columns to app format
+    const mapped = (data || []).map((row) => ({
+      id: row.id,
+      spotId: row.spot_id,
+      guest: row.guest,
+      unit: row.unit || '',
+      vehicle: row.vehicle || '',
+      checkIn: row.check_in,
+      checkOut: row.check_out,
+      notes: row.notes || '',
+      status: row.status,
+    }));
+ 
+    setBookings(mapped);
+    setLoading(false);
+  }, []);
+ 
+  useEffect(() => {
+    fetchBookings();
+ 
+    // Real-time subscription — all changes sync instantly
+    const channel = supabase
+      .channel('bookings-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => {
+        fetchBookings();
+      })
+      .subscribe();
+ 
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchBookings]);
+ 
+  // Save booking
+  const handleSaveBooking = async (entry, isEdit) => {
+    const row = {
+      id: entry.id,
+      spot_id: entry.spotId,
+      guest: entry.guest,
+      unit: entry.unit || null,
+      vehicle: entry.vehicle || null,
+      check_in: entry.checkIn,
+      check_out: entry.checkOut,
+      notes: entry.notes || null,
+      status: entry.status,
+    };
+ 
     if (isEdit) {
-      setBookings((prev) => prev.map((b) => (b.id === entry.id ? entry : b)));
+      const { error } = await supabase.from('bookings').update(row).eq('id', entry.id);
+      if (error) { showToast('Error updating booking'); return; }
       showToast(`Booking updated for ${entry.guest}`);
     } else {
-      setBookings((prev) => [...prev, entry]);
+      const { error } = await supabase.from('bookings').insert(row);
+      if (error) { showToast('Error creating booking'); return; }
       showToast(`${entry.spotId} booked for ${entry.guest}`);
     }
+ 
     triggerPulse(entry.spotId);
     setBookingModal(null);
+    fetchBookings();
   };
-
-  const handleCancelBooking = (bookingId) => {
-    setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: 'cancelled' } : b)));
+ 
+  // Cancel booking
+  const handleCancelBooking = async (bookingId) => {
+    const { error } = await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId);
+    if (error) { showToast('Error cancelling booking'); return; }
     showToast('Booking cancelled');
+    fetchBookings();
   };
-
-  const handleStatusChange = (bookingId, newStatus) => {
-    setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b)));
+ 
+  // Change status (check in / complete)
+  const handleStatusChange = async (bookingId, newStatus) => {
+    const { error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId);
+    if (error) { showToast('Error updating status'); return; }
     showToast(newStatus === 'active' ? 'Guest checked in' : 'Booking completed');
+    fetchBookings();
   };
-
-  const handleReset = () => { setBookings(DEFAULT_BOOKINGS); showToast('All bookings cleared'); };
-
+ 
+  // Clear all
+  const handleReset = async () => {
+    const { error } = await supabase.from('bookings').delete().neq('id', '');
+    if (error) { showToast('Error clearing bookings'); return; }
+    showToast('All bookings cleared');
+    fetchBookings();
+  };
+ 
   const isSearching = searchIn && searchOut && searchIn < searchOut;
   const availableSpotIds = isSearching
     ? new Set(getAvailableSpots(SPOTS, bookings, searchIn, searchOut).map((s) => s.id))
     : null;
-
+ 
   const occupiedNow = SPOTS.filter((spot) =>
     bookings.some((b) => b.spotId === spot.id && b.status === 'active' && b.checkIn <= today && b.checkOut > today)
   ).length;
   const reservedFuture = bookings.filter((b) => b.status === 'reserved' && b.checkIn > today).length;
   const activeBookings = bookings.filter((b) => b.status === 'active' || b.status === 'reserved');
-
+ 
+  if (loading) {
+    return (
+      <div className={styles.wrapper} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>🅿️</div>
+          <div style={{ color: '#78909C', fontSize: 15, fontWeight: 500 }}>Loading parking data...</div>
+        </div>
+      </div>
+    );
+  }
+ 
   return (
     <div className={styles.wrapper}>
       {/* Header */}
@@ -89,7 +174,7 @@ export default function App() {
           <button className={styles.resetBtn} onClick={handleReset}>Clear All</button>
         </div>
       </header>
-
+ 
       {/* Availability Search */}
       {view !== 'calendar' && (
         <div className={`${styles.searchSection} ${isSearching ? styles.searchActive : ''}`}>
@@ -123,7 +208,7 @@ export default function App() {
           )}
         </div>
       )}
-
+ 
       {/* Stats */}
       <div className={styles.statsBar}>
         {[
@@ -138,7 +223,7 @@ export default function App() {
           </div>
         ))}
       </div>
-
+ 
       {/* Calendar View */}
       {view === 'calendar' && (
         <CalendarView
@@ -146,7 +231,7 @@ export default function App() {
           onClickSpot={(spot) => setBookingModal({ spot, booking: null })}
         />
       )}
-
+ 
       {/* Card / List View */}
       {view !== 'calendar' && (
         <div className={view === 'cards' ? styles.grid : styles.list}>
@@ -164,7 +249,7 @@ export default function App() {
           ))}
         </div>
       )}
-
+ 
       {/* Booking Modal */}
       {bookingModal && (
         <BookingModal
@@ -175,7 +260,7 @@ export default function App() {
           onClose={() => setBookingModal(null)}
         />
       )}
-
+ 
       {/* Booking History */}
       {historySpot && (
         <BookingHistory
@@ -187,9 +272,9 @@ export default function App() {
           onClose={() => setHistorySpot(null)}
         />
       )}
-
+ 
       {/* Toast */}
       {toast && <div className={styles.toast}>{toast}</div>}
     </div>
   );
-}
+  
