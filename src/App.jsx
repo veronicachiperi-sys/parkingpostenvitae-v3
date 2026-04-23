@@ -6,38 +6,38 @@ import BookingModal from './BookingModal';
 import BookingHistory from './BookingHistory';
 import CalendarView from './CalendarView';
 import styles from './App.module.css';
- 
+
 export default function App() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('cards');
   const [toast, setToast] = useState(null);
   const [animatingId, setAnimatingId] = useState(null);
- 
+
   const [bookingModal, setBookingModal] = useState(null);
   const [historySpot, setHistorySpot] = useState(null);
- 
+
   const [searchIn, setSearchIn] = useState('');
   const [searchOut, setSearchOut] = useState('');
- 
+
   const today = new Date().toISOString().split('T')[0];
- 
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
   const triggerPulse = (id) => { setAnimatingId(id); setTimeout(() => setAnimatingId(null), 600); };
- 
+
   // Load bookings from Supabase
   const fetchBookings = useCallback(async () => {
     const { data, error } = await supabase
       .from('bookings')
       .select('*')
       .order('check_in', { ascending: true });
- 
+
     if (error) {
       console.error('Error fetching bookings:', error);
       showToast('Error loading bookings');
       return;
     }
- 
+
     // Map database columns to app format
     const mapped = (data || []).map((row) => ({
       id: row.id,
@@ -50,14 +50,14 @@ export default function App() {
       notes: row.notes || '',
       status: row.status,
     }));
- 
+
     setBookings(mapped);
     setLoading(false);
   }, []);
- 
+
   useEffect(() => {
     fetchBookings();
- 
+
     // Real-time subscription — all changes sync instantly
     const channel = supabase
       .channel('bookings-changes')
@@ -65,10 +65,10 @@ export default function App() {
         fetchBookings();
       })
       .subscribe();
- 
+
     return () => { supabase.removeChannel(channel); };
   }, [fetchBookings]);
- 
+
   // Save booking
   const handleSaveBooking = async (entry, isEdit) => {
     const row = {
@@ -82,7 +82,7 @@ export default function App() {
       notes: entry.notes || null,
       status: entry.status,
     };
- 
+
     if (isEdit) {
       const { error } = await supabase.from('bookings').update(row).eq('id', entry.id);
       if (error) { showToast('Error updating booking'); return; }
@@ -92,12 +92,12 @@ export default function App() {
       if (error) { showToast('Error creating booking'); return; }
       showToast(`${entry.spotId} booked for ${entry.guest}`);
     }
- 
+
     triggerPulse(entry.spotId);
     setBookingModal(null);
     fetchBookings();
   };
- 
+
   // Cancel booking
   const handleCancelBooking = async (bookingId) => {
     const { error } = await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId);
@@ -105,7 +105,7 @@ export default function App() {
     showToast('Booking cancelled');
     fetchBookings();
   };
- 
+
   // Change status (check in / complete)
   const handleStatusChange = async (bookingId, newStatus) => {
     const { error } = await supabase.from('bookings').update({ status: newStatus }).eq('id', bookingId);
@@ -113,7 +113,7 @@ export default function App() {
     showToast(newStatus === 'active' ? 'Guest checked in' : 'Booking completed');
     fetchBookings();
   };
- 
+
   // Clear all
   const handleReset = async () => {
     const { error } = await supabase.from('bookings').delete().neq('id', '');
@@ -121,18 +121,18 @@ export default function App() {
     showToast('All bookings cleared');
     fetchBookings();
   };
- 
+
   const isSearching = searchIn && searchOut && searchIn < searchOut;
   const availableSpotIds = isSearching
     ? new Set(getAvailableSpots(SPOTS, bookings, searchIn, searchOut).map((s) => s.id))
     : null;
- 
+
   const occupiedNow = SPOTS.filter((spot) =>
     bookings.some((b) => b.spotId === spot.id && b.status === 'active' && b.checkIn <= today && b.checkOut > today)
   ).length;
   const reservedFuture = bookings.filter((b) => b.status === 'reserved' && b.checkIn > today).length;
   const activeBookings = bookings.filter((b) => b.status === 'active' || b.status === 'reserved');
- 
+
   if (loading) {
     return (
       <div className={styles.wrapper} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
@@ -143,7 +143,7 @@ export default function App() {
       </div>
     );
   }
- 
+
   return (
     <div className={styles.wrapper}>
       {/* Header */}
@@ -174,7 +174,7 @@ export default function App() {
           <button className={styles.resetBtn} onClick={handleReset}>Clear All</button>
         </div>
       </header>
- 
+
       {/* Availability Search */}
       {view !== 'calendar' && (
         <div className={`${styles.searchSection} ${isSearching ? styles.searchActive : ''}`}>
@@ -208,7 +208,7 @@ export default function App() {
           )}
         </div>
       )}
- 
+
       {/* Stats */}
       <div className={styles.statsBar}>
         {[
@@ -223,7 +223,7 @@ export default function App() {
           </div>
         ))}
       </div>
- 
+
       {/* Calendar View */}
       {view === 'calendar' && (
         <CalendarView
@@ -231,7 +231,7 @@ export default function App() {
           onClickSpot={(spot) => setBookingModal({ spot, booking: null })}
         />
       )}
- 
+
       {/* Card / List View */}
       {view !== 'calendar' && (
         <div className={view === 'cards' ? styles.grid : styles.list}>
@@ -249,7 +249,7 @@ export default function App() {
           ))}
         </div>
       )}
- 
+
       {/* Booking Modal */}
       {bookingModal && (
         <BookingModal
@@ -260,7 +260,7 @@ export default function App() {
           onClose={() => setBookingModal(null)}
         />
       )}
- 
+
       {/* Booking History */}
       {historySpot && (
         <BookingHistory
@@ -272,9 +272,9 @@ export default function App() {
           onClose={() => setHistorySpot(null)}
         />
       )}
- 
+
       {/* Toast */}
       {toast && <div className={styles.toast}>{toast}</div>}
     </div>
   );
-  
+}
