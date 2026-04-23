@@ -1,0 +1,50 @@
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; animation: fadeIn 0.2s ease; padding: 20px;
+}
+.modal {
+  background: #fff; border-radius: 16px; width: 100%; max-width: 480px;
+  max-height: 90vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s ease;
+}
+.header { display: flex; justify-content: space-between; align-items: flex-start; padding: 20px 24px 0; }
+.title { font-size: 20px; font-weight: 700; color: var(--navy); }
+.close {
+  border: none; background: #F5F5F5; width: 32px; height: 32px; border-radius: 8px;
+  font-size: 20px; color: #546E7A; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.close:hover { background: #EEE; }
+.body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.label { font-size: 12px; font-weight: 600; color: var(--slate); text-transform: uppercase; letter-spacing: 0.4px; }
+.input, .select, .textarea {
+  border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+  font-size: 14px; font-family: var(--font-body); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; width: 100%; background: #fff;
+}
+.input:focus, .select:focus, .textarea:focus { border-color: var(--navy-light); box-shadow: 0 0 0 3px var(--navy-glow); }
+.textarea { resize: vertical; }
+.dateRow { display: flex; gap: 12px; }
+.dateError { font-size: 12px; color: var(--red); font-weight: 500; margin-top: -8px; }
+.conflictWarning {
+  background: #FFF3E0; border: 1px solid #FFE082; border-radius: 10px;
+  padding: 12px 14px; font-size: 13px; font-weight: 500; color: #E65100;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.conflictDetail { font-size: 12px; color: #BF360C; padding-left: 20px; }
+.footer { display: flex; justify-content: flex-end; gap: 10px; padding: 0 24px 20px; }
+.cancelBtn {
+  border: 1px solid var(--border); background: #fff; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; font-weight: 500; color: #546E7A;
+  cursor: pointer; font-family: var(--font-body);
+}
+.cancelBtn:hover { background: #F5F5F5; }
+.saveBtn {
+  border: none; background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff; border-radius: 8px; padding: 10px 28px; font-size: 14px;
+  font-weight: 600; cursor: pointer; font-family: var(--font-body);
+  box-shadow: 0 4px 12px var(--navy-glow);
+}
+.saveBtn:disabled { opacity: 0.5; cursor: not-allowed; }

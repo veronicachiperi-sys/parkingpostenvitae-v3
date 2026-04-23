@@ -1,0 +1,47 @@
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; animation: fadeIn 0.2s ease; padding: 20px;
+}
+.panel {
+  background: #fff; border-radius: 16px; width: 100%; max-width: 520px;
+  max-height: 85vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s ease;
+}
+.header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: #fff; border-radius: 16px 16px 0 0; z-index: 1;
+}
+.title { font-size: 18px; font-weight: 700; color: var(--navy); }
+.subtitle { font-size: 13px; color: var(--slate); margin-top: 2px; }
+.close {
+  border: none; background: #F5F5F5; width: 32px; height: 32px; border-radius: 8px;
+  font-size: 20px; color: #546E7A; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.close:hover { background: #EEE; }
+.body { padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 12px; }
+.empty { text-align: center; color: var(--slate-light); padding: 24px 0; font-size: 14px; }
+.bookingCard { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; transition: box-shadow 0.15s; }
+.bookingCard:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.bookingHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.guest { font-weight: 600; font-size: 14px; color: var(--dark); }
+.unit { font-size: 12px; color: var(--slate); margin-left: 8px; }
+.statusBadge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+.dates { font-family: var(--font-mono); font-size: 13px; color: #546E7A; margin-bottom: 4px; }
+.meta { font-size: 12px; color: var(--slate); margin-top: 2px; }
+.pastWarning { font-size: 12px; color: #F57F17; font-weight: 500; margin-top: 6px; }
+.bookingActions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.editBtn, .cancelBtn, .completeBtn, .activateBtn {
+  border: 1px solid var(--border); background: #fff; border-radius: 6px;
+  padding: 5px 12px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font-body);
+}
+.editBtn { color: var(--navy); }
+.editBtn:hover { background: #E8EAF6; }
+.activateBtn { color: var(--green); border-color: var(--green); }
+.activateBtn:hover { background: var(--green-bg); }
+.completeBtn { color: var(--green); border-color: var(--green); }
+.completeBtn:hover { background: var(--green-bg); }
+.cancelBtn { color: var(--red); }
+.cancelBtn:hover { background: var(--red-bg); }

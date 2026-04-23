@@ -1,0 +1,88 @@
+.wrapper { min-height: 100vh; padding: 28px 24px 60px; max-width: 1060px; margin: 0 auto; }
+
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+.headerTop { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.logo {
+  display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px;
+  border-radius: 10px; background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  color: #fff; font-family: var(--font-mono); font-weight: 700; font-size: 20px;
+  letter-spacing: -1px; box-shadow: 0 4px 14px var(--navy-glow);
+}
+.title { font-size: 26px; font-weight: 700; color: var(--navy); letter-spacing: -0.5px; }
+.subtitle { font-size: 13px; color: var(--slate); margin-top: 2px; padding-left: 56px; }
+.headerActions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* View tabs */
+.viewTabs {
+  display: flex; background: #fff; border-radius: 8px;
+  border: 1px solid var(--border); overflow: hidden;
+}
+.viewTab {
+  border: none; background: transparent; padding: 8px 16px;
+  cursor: pointer; font-size: 13px; font-weight: 500; color: var(--slate-light);
+  font-family: var(--font-body); transition: all 0.2s;
+}
+.viewTabActive { background: var(--navy); color: #fff; }
+
+.resetBtn {
+  border: 1px solid var(--border); background: #fff; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 500; color: var(--slate);
+  cursor: pointer; font-family: var(--font-body);
+}
+.resetBtn:hover { background: #F5F5F5; }
+
+/* Availability Search */
+.searchSection {
+  background: var(--card-bg); border-radius: 14px; padding: 18px 22px;
+  margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  border: 2px solid transparent; transition: border-color 0.2s;
+}
+.searchActive { border-color: var(--navy-light); }
+.searchHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.searchTitle { font-size: 15px; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+.searchIcon { font-size: 18px; }
+.clearBtn {
+  border: none; background: none; font-size: 13px; color: var(--slate);
+  cursor: pointer; font-family: var(--font-body); font-weight: 500; text-decoration: underline;
+}
+.searchRow { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+.searchField { display: flex; flex-direction: column; gap: 4px; }
+.searchLabel { font-size: 11px; font-weight: 600; color: var(--slate); text-transform: uppercase; letter-spacing: 0.4px; }
+.searchInput {
+  border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+  font-size: 14px; font-family: var(--font-body); outline: none;
+}
+.searchInput:focus { border-color: var(--navy-light); box-shadow: 0 0 0 3px var(--navy-glow); }
+.searchResult { margin-top: 12px; font-size: 14px; font-weight: 600; padding: 10px 14px; border-radius: 8px; }
+.searchAvailable { background: var(--green-bg); color: #2E7D32; }
+.searchNone { background: var(--red-bg); color: var(--red); }
+
+/* Stats */
+.statsBar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.statCard {
+  background: var(--card-bg); border-radius: 12px; padding: 16px 18px;
+  text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); animation: slideUp 0.4s ease both;
+}
+.statValue { font-family: var(--font-mono); font-size: 28px; font-weight: 700; line-height: 1.1; }
+.statLabel { font-size: 12px; color: var(--slate-light); font-weight: 500; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Grid & List */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.empty { text-align: center; padding: 48px; color: var(--slate-light); font-size: 15px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  background: var(--dark); color: #fff; padding: 12px 24px; border-radius: 10px;
+  font-size: 14px; font-weight: 500; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  z-index: 1000; animation: toastSlide 0.3s ease;
+}
+
+@media (max-width: 600px) {
+  .wrapper { padding: 16px 12px 40px; }
+  .statsBar { grid-template-columns: repeat(2, 1fr); }
+  .subtitle { padding-left: 0; margin-top: 8px; }
+  .statValue { font-size: 22px; }
+  .searchRow { flex-direction: column; }
+}

@@ -1,0 +1,35 @@
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 18px;
+  border-left: 4px solid transparent;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  animation: popIn 0.35s ease both;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); transform: translateY(-2px); }
+.pulse { animation: pulse 0.5s ease; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.id { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--dark); }
+.status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 8px; white-space: nowrap; }
+.details {
+  display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px;
+  padding: 10px 12px; background: var(--surface); border-radius: 8px;
+}
+.row { display: flex; justify-content: space-between; font-size: 13px; }
+.label { color: var(--slate-light); font-weight: 500; }
+.value { color: #37474F; font-weight: 500; text-align: right; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bookingCount { font-size: 12px; color: var(--slate); margin-bottom: 10px; padding-left: 2px; }
+.actions { display: flex; gap: 8px; }
+.bookBtn {
+  flex: 1; border: none; background: var(--navy); color: #fff; border-radius: 8px;
+  padding: 9px 0; font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); transition: background 0.2s;
+}
+.bookBtn:hover { background: var(--navy-light); }
+.viewBtn {
+  border: 1px solid var(--border); background: var(--card-bg); border-radius: 8px;
+  padding: 9px 14px; font-size: 12px; font-weight: 500; color: var(--slate);
+  cursor: pointer; font-family: var(--font-body); transition: background 0.15s;
+}
+.viewBtn:hover { background: var(--surface); }
