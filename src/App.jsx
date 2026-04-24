@@ -136,7 +136,6 @@ export default function App() {
       )}
     </>
   )}
-  
 
   const occupiedNow = SPOTS.filter((spot) =>
     bookings.some((b) => b.spotId === spot.id && b.status === 'active' && b.checkIn <= today && b.checkOut > today)
