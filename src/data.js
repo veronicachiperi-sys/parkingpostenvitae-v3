@@ -1,14 +1,14 @@
 export const SPOTS = [
-  { id: "Spot 1" },
-  { id: "Spot 10" },
-  { id: "Spot 16" },
-  { id: "Spot 17" },
-  { id: "Spot 22" },
-  { id: "Spot 33" },
-  { id: "Spot 34" },
-  { id: "Spot 36" },
-  { id: "Spot 39" },
-  { id: "Spot 40" },
+  { id: "Spot 1", type: "Garage" },
+  { id: "Spot 10", type: "Garage" },
+  { id: "Spot 16", type: "Garage" },
+  { id: "Spot 17", type: "Garage" },
+  { id: "Spot 22", type: "Lot" },
+  { id: "Spot 33", type: "Lot" },
+  { id: "Spot 34", type: "Lot" },
+  { id: "Spot 36", type: "Lot" },
+  { id: "Spot 39", type: "Lot" },
+  { id: "Spot 40", type: "Lot" },
 ];
 
 export const DEFAULT_BOOKINGS = [];
