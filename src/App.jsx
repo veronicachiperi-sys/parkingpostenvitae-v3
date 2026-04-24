@@ -122,10 +122,21 @@ export default function App() {
     fetchBookings();
   };
 
-  const isSearching = searchIn && searchOut && searchIn < searchOut;
-  const availableSpotIds = isSearching
-    ? new Set(getAvailableSpots(SPOTS, bookings, searchIn, searchOut).map((s) => s.id))
-    : null;
+  {isSearching && (
+    <>
+      <div className={`${styles.searchResult} ${availableSpotIds.size > 0 ? styles.searchAvailable : styles.searchNone}`}>
+        {availableSpotIds.size > 0
+          ? SPOTS.filter(s => availableSpotIds.has(s.id)).map(s => s.id).join(', ')
+          : `No spots available for ${searchIn} → ${searchOut} — all booked`}
+      </div>
+      {availableSpotIds.size > 0 && (
+        <div className={`${styles.searchResult} ${styles.searchAvailable}`} style={{ marginTop: 8 }}>
+          {`${availableSpotIds.size} of ${SPOTS.length} spots available for ${searchIn} → ${searchOut}`}
+        </div>
+      )}
+    </>
+  )}
+  
 
   const occupiedNow = SPOTS.filter((spot) =>
     bookings.some((b) => b.spotId === spot.id && b.status === 'active' && b.checkIn <= today && b.checkOut > today)
