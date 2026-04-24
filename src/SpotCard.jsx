@@ -41,7 +41,12 @@ export default function SpotCard({ spot, bookings, today, isAnimating, onBook, o
       style={{ borderLeftColor: spotStatusColor }}
     >
       <div className={styles.header}>
-        <span className={styles.id}>{spot.id}</span>
+      <div>
+          <span className={styles.id}>{spot.id}</span>
+          <div style={{ fontSize: 11, color: '#78909C', fontWeight: 500, marginTop: 2 }}>
+            {spot.type === 'Garage' ? '🏢 Garage (Covered)' : '🅿️ Lot (Uncovered)'}
+          </div>
+        </div>
         <span className={styles.status} style={{ backgroundColor: spotStatusBg, color: spotStatusColor }}>
           {spotStatus}
         </span>
