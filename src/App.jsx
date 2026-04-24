@@ -183,10 +183,12 @@ export default function App() {
               Check Availability
             </span>
             {isSearching && (
-              <button className={styles.clearBtn} onClick={() => { setSearchIn(''); setSearchOut(''); }}>
-                Clear search
-              </button>
-            )}
+            <div className={`${styles.searchResult} ${availableSpotIds.size > 0 ? styles.searchAvailable : styles.searchNone}`}>
+              {availableSpotIds.size > 0
+                ? `${availableSpotIds.size} of ${SPOTS.length} spots available for ${searchIn} → ${searchOut}: ${SPOTS.filter(s => availableSpotIds.has(s.id)).map(s => s.id).join(', ')}`
+                : `No spots available for ${searchIn} → ${searchOut} — all booked`}
+            </div>
+          )}
           </div>
           <div className={styles.searchRow}>
             <div className={styles.searchField}>
