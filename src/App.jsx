@@ -170,7 +170,7 @@ export default function App() {
                 onClick={() => setView(v.key)}
               >{v.label}</button>
             ))}
-  jsx          </div>
+         </div>
         </div>
       </header>
 
