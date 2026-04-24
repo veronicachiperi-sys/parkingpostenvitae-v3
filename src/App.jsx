@@ -187,4 +187,90 @@ export default function App() {
           <div className={styles.searchRow}>
             <div className={styles.searchField}>
               <label className={styles.searchLabel}>Check-in</label>
-              <input type="date" className={styles.searchInput}
+              <input type="date" className={styles.searchInput} value={searchIn} onChange={(e) => setSearchIn(e.target.value)} />
+            </div>
+            <div className={styles.searchField}>
+              <label className={styles.searchLabel}>Check-out</label>
+              <input type="date" className={styles.searchInput} value={searchOut} onChange={(e) => setSearchOut(e.target.value)} />
+            </div>
+          </div>
+          {isSearching && (
+            <>
+              <div className={`${styles.searchResult} ${availableSpotIds.size > 0 ? styles.searchAvailable : styles.searchNone}`}>
+                {availableSpotIds.size > 0
+                  ? SPOTS.filter(s => availableSpotIds.has(s.id)).map(s => s.id).join(', ')
+                  : `No spots available for ${searchIn} → ${searchOut} — all booked`}
+              </div>
+              {availableSpotIds.size > 0 && (
+                <div className={`${styles.searchResult} ${styles.searchAvailable}`} style={{ marginTop: 8 }}>
+                  {`${availableSpotIds.size} of ${SPOTS.length} spots available for ${searchIn} → ${searchOut}`}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      <div className={styles.statsBar}>
+        {[
+          { label: 'Total Spots', value: SPOTS.length, color: '#546E7A' },
+          { label: 'Occupied Now', value: occupiedNow, color: 'var(--red)' },
+          { label: 'Future Res.', value: reservedFuture, color: 'var(--orange)' },
+          { label: 'Active Bookings', value: activeBookings.length, color: 'var(--navy)' },
+        ].map((s, i) => (
+          <div key={i} className={styles.statCard} style={{ animationDelay: `${i * 80}ms` }}>
+            <div className={styles.statValue} style={{ color: s.color }}>{s.value}</div>
+            <div className={styles.statLabel}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {view === 'calendar' && (
+        <CalendarView
+          bookings={bookings}
+          onClickSpot={(spot) => setBookingModal({ spot, booking: null })}
+        />
+      )}
+
+      {view !== 'calendar' && (
+        <div className={view === 'cards' ? styles.grid : styles.list}>
+          {SPOTS.map((spot) => (
+            <SpotCard
+              key={spot.id}
+              spot={spot}
+              bookings={bookings}
+              today={today}
+              isAnimating={animatingId === spot.id}
+              availableForSearch={isSearching ? availableSpotIds.has(spot.id) : null}
+              onBook={(s) => setBookingModal({ spot: s, booking: null })}
+              onViewBookings={(s) => setHistorySpot(s)}
+            />
+          ))}
+        </div>
+      )}
+
+      {bookingModal && (
+        <BookingModal
+          spot={bookingModal.spot}
+          booking={bookingModal.booking}
+          bookings={bookings}
+          onSave={handleSaveBooking}
+          onClose={() => setBookingModal(null)}
+        />
+      )}
+
+      {historySpot && (
+        <BookingHistory
+          spot={historySpot}
+          bookings={bookings}
+          onEdit={(b) => { setHistorySpot(null); setBookingModal({ spot: historySpot, booking: b }); }}
+          onCancel={handleCancelBooking}
+          onComplete={handleStatusChange}
+          onClose={() => setHistorySpot(null)}
+        />
+      )}
+
+      {toast && <div className={styles.toast}>{toast}</div>}
+    </div>
+  );
+}
