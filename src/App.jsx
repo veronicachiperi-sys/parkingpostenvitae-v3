@@ -170,8 +170,7 @@ export default function App() {
                 onClick={() => setView(v.key)}
               >{v.label}</button>
             ))}
-          </div>
-          <button className={styles.resetBtn} onClick={handleReset}>Clear All</button>
+  jsx          </div>
         </div>
       </header>
 
